@@ -66,31 +66,21 @@ generate_pie_chart(data)
 markdown = f"""# Genshin Impact - Whale Calculator
 This is a Calculator what is a maximu for GI whale spend on game with worst luck. 
 
-## Spend Distribution
+## Pie Spend Distribution
 
 ![Whale Chart]({SPEND_CHARD_NAME})
 
-"""
-
-"""
-
-## Total Spend
-
-all C6 characters   {data["Characters"]["spend"]:.2f} usd
-
-all R5 weapons      {data["Weapons"]["spend"]:.2f} usd
-
-Welkin Moon         {data["Welkin_Moon"]["spend"]:.2f} usd
-
-Battle Pass         {data["BP"]["spend"]:.2f} usd
-
-Battle Pass levl up {data["BP_LV_UP"]["spend"]:.2f} usd
-
-Refil Resin         {data["resin_refill"]["spend"]:.2f} usd
-
----
-
-total               {data["total_spend"]:.2f} usd
+## Table Spend Distribution
+| Type | Spend | 
+| :--- | :--- |
+| all C6 characters    | {data["Characters"]["spend"]:.2f} usd |
+| all R5 weapons       | {data["Weapons"]["spend"]:.2f} usd |
+| Welkin Moon          | {data["Welkin_Moon"]["spend"]:.2f} usd |
+| Battle Pass          | {data["BP"]["spend"]:.2f} usd |
+| Battle Pass levl up  | {data["BP_LV_UP"]["spend"]:.2f} usd |
+| Refil Resin          | {data["resin_refill"]["spend"]:.2f} usd |
+| | |
+| Totalz                 | {data["total_spend"]:.2f} usd |
 """
 
 write_readme(markdown)
