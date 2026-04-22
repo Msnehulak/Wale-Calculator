@@ -1,11 +1,25 @@
 Directory structure:
 └── Whale_Calculator/
+    ├── README.md
     ├── LICENSE
     ├── update_readme.py
     ├── whale_calculator.py
     └── .github/
         └── workflows/
             └── update.yml
+
+================================================
+FILE: README.md
+================================================
+# Genshin Impact - Whale Calculator
+This is a Calculator what is a maximu for GI whale spend on game with worst luck. 
+
+## Spend Distribution
+
+![Whale Chart](spend_chart.png)
+
+
+
 
 ================================================
 FILE: LICENSE
@@ -43,14 +57,14 @@ import matplotlib.pyplot as plt
 SPEND_CHARD_NAME = "spend_chart.png"
 
 def generate_pie_chart(data):
-    categories = ['Characters', 'Weapons', 'Welkin', 'BattlePass', 'BP Levels', 'Resin Refill']
+    categories = ['Characters', 'Weapons', 'Resin Refill', 'Welkin', 'BattlePass', 'BP Levels']
     values = [
         data["Characters"]["spend"],
         data["Weapons"]["spend"],
+        data["resin_refill"]["spend"],
         data["Welkin_Moon"]["spend"],
         data["BP"]["spend"],
         data["BP_LV_UP"]["spend"],
-        data["resin_refill"]["spend"]
     ]
 
     total = sum(values)
@@ -71,7 +85,7 @@ def generate_pie_chart(data):
     ax.legend(
         wedges, 
         legend_labels,
-        title="Spending Categories",
+        title="Categories",
         loc="center left",
         bbox_to_anchor=(1, 0, 0.5, 1),
         fontsize=12,
@@ -334,7 +348,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add README.md
+          git add README.md spend_chart.png
           git commit -m "Update daily stats in README" || exit 0
           git push
 

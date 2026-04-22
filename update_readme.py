@@ -4,14 +4,14 @@ import matplotlib.pyplot as plt
 SPEND_CHARD_NAME = "spend_chart.png"
 
 def generate_pie_chart(data):
-    categories = ['Characters', 'Weapons', 'Welkin', 'BattlePass', 'BP Levels', 'Resin Refill']
+    categories = ['Characters', 'Weapons', 'Resin Refill', 'Welkin', 'BattlePass', 'BP Levels']
     values = [
         data["Characters"]["spend"],
         data["Weapons"]["spend"],
+        data["resin_refill"]["spend"],
         data["Welkin_Moon"]["spend"],
         data["BP"]["spend"],
         data["BP_LV_UP"]["spend"],
-        data["resin_refill"]["spend"]
     ]
 
     total = sum(values)
@@ -32,7 +32,7 @@ def generate_pie_chart(data):
     ax.legend(
         wedges, 
         legend_labels,
-        title="Spending Categories",
+        title="Categories",
         loc="center left",
         bbox_to_anchor=(1, 0, 0.5, 1),
         fontsize=12,
