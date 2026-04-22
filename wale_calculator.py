@@ -3,8 +3,6 @@ import requests
 
 class whalecalculator:
     def __init__(self):
-        self.standart5char = ["Jean", "Diluc", "Qiqi", "Mona", "Keqing", "Tighnari", "Dehya", "Mizuki"]
-        self.limited5char = self.get_limited_character_count()
         self.prices = {
             "welkin": 4.99,
             "battle_pass": 9.99,
@@ -19,22 +17,49 @@ class whalecalculator:
         }
         self.primo = {
             "bplvup": 150,
-            "refil rezin": 50,
+            "refil_resin": 50,
             "pull": 160
         }
         self.total_spend = 0
-            # Date
+        
+
         self.release_date = date(2020, 9, 28)
         self.today_date = date.today()
         self.days_from_releas = self.today_date - self.release_date
         self.days_from_releas = self.days_from_releas.days
         self.versin_released = self.days_from_releas // (7 * 6) 
 
+        self.Characters()
+        self.Weapons()
         self.Welkin_Moon()
         self.Batle_pass()
         self.Batle_pass_levl_up()
         self.Daly_resin_refill()
-        
+
+    def Characters(self):
+        self.char_standard5_list = ["Jean", "Diluc", "Qiqi", "Mona", "Keqing", "Tighnari", "Dehya", "Mizuki"]
+        self.char_standard5_count = len(self.char_standard5_list) 
+        self.char_limited5char_list = self.get_limited_character_count()
+        self.char_limited5_count = len(self.char_limited5char_list)
+
+        self.char_pulls_one_copy = 180
+        self.char_pulls_C6 = self.char_pulls_one_copy * 7
+        self.char_total_pulls = self.char_pulls_C6 * self.char_limited5_count
+        self.char_total_primo = self.char_total_pulls * self.primo["pull"]
+        self.char_spend = self.primo_to_usd(self.char_total_primo)
+
+        self.total_spend += self.char_spend
+    
+    def Weapons(self):
+        self.wpn_count = self.char_limited5_count
+        self.wpn_pulls_one_copy = 80
+        self.wpn_pulls_R5 = self.wpn_pulls_one_copy * 5
+        self.wpn_total_pulls = self.wpn_pulls_R5 * self.wpn_count
+        self.wpn_total_primo = self.wpn_total_pulls * self.primo["pull"]
+        self.wpn_spend = self.primo_to_usd(self.wpn_total_primo)
+
+        self.total_spend += self.wpn_spend
+
     def Welkin_Moon(self):
         self.welkin_moon_owned = self.days_from_releas // 30 
         self.welkin_moon_spend = self.welkin_moon_owned * self.prices["welkin"]
@@ -56,7 +81,8 @@ class whalecalculator:
 
     def Daly_resin_refill(self):
         self.resin_refill_limit = 5
-        self.resin_refil_spend_primo = self.resin_refill_limit * self.days_from_releas
+        self.resin_refil_count = self.resin_refill_limit * self.days_from_releas
+        self.resin_refil_spend_primo = self.resin_refil_count * self.primo["refil_resin"]
         self.resin_refil_spend = self.primo_to_usd(self.resin_refil_spend_primo)
 
         self.total_spend += self.resin_refil_spend
@@ -72,10 +98,10 @@ class whalecalculator:
             print("error, API don't work")
             return []
         
-            # Filter Standart 5*
+            # Filter standard 5*
         limited5char = []
         for char in characters:
-            if char in self.standart5char:
+            if char in self.char_standard5_list:
                 pass
             else:
                 limited5char.append(char)
@@ -100,6 +126,8 @@ Welkin Moon         {self.welkin_moon_spend:.2f} usd
 Battle Pass         {self.BP_spend:.2f} usd
 Battle Pass levl up {self.BP_LV_UP_spend:.2f} usd
 Refil Resin         {self.resin_refil_spend:.2f} usd
+all C6 characters   {self.char_spend:.2f} usd
+all R5 weapons      {self.wpn_spend:.2f} usd 
 
 total               {self.total_spend:.2f} usd
 {"="*40}
