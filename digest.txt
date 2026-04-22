@@ -1,24 +1,36 @@
 Directory structure:
 └── Wale Calculator/
-    ├── README.md
+    ├── LICENSE
     ├── update_readme.py
-    └── whale_calculator.py
+    ├── whale_calculator.py
+    └── .github/
+        └── workflows/
+            └── update.yml
 
 ================================================
-FILE: README.md
+FILE: LICENSE
 ================================================
-# Genshin Impact - Whale Calculator
-This is a Calculator what is a maximu for GI whale spend on game with worst luck. 
+MIT License
 
-## Total Spend
-all C6 characters   190002.21 usd
-all R5 weapons      60318.16 usd
-Welkin Moon         334.33 usd
-Battle Pass         479.52 usd
-Battle Pass levl up 5654.83 usd
-Refil Resin         7979.59 usd
+Copyright (c) 2026 Maxim
 
-total               264768.64 usd
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 
 
@@ -26,6 +38,51 @@ total               264768.64 usd
 FILE: update_readme.py
 ================================================
 import whale_calculator
+import matplotlib.pyplot as plt
+
+
+SPEND_CHARD_NAME = "spend_chart.png"
+
+def generate_pie_chart(data):
+    categories = ['Characters', 'Weapons', 'Welkin', 'BattlePass', 'BP Levels', 'Resin Refill']
+    values = [
+        data["Characters"]["spend"],
+        data["Weapons"]["spend"],
+        data["Welkin_Moon"]["spend"],
+        data["BP"]["spend"],
+        data["BP_LV_UP"]["spend"],
+        data["resin_refill"]["spend"]
+    ]
+
+    total = sum(values)
+    legend_labels = [f'{l}: {v/total*100:1.1f}%' for l, v in zip(categories, values)]
+
+    colors = ['#ff9999','#66b3ff','#99ff99','#ffcc99','#c2c2f0','#ffb3e6']
+
+    fig, ax = plt.subplots(figsize=(14, 8), facecolor='none')
+
+    wedges, _ = ax.pie(
+        values, 
+        colors=colors, 
+        startangle=140, 
+        pctdistance=0.85,
+        labeldistance=1.1
+    )
+
+    ax.legend(
+        wedges, 
+        legend_labels,
+        title="Spending Categories",
+        loc="center left",
+        bbox_to_anchor=(1, 0, 0.5, 1),
+        fontsize=12,
+        frameon=True,
+    )
+
+    ax.set_title('Genshin Impact Whale Spend Distribution', pad=20, size=16, color='white')
+
+    plt.savefig('spend_chart.png', transparent=True, bbox_inches='tight')
+    plt.close()
 
 def write_readme(markdown):
     with open("README.md", "w", encoding="utf-8") as f:
@@ -34,16 +91,44 @@ def write_readme(markdown):
 wc = whale_calculator.whalecalculator()
 data = wc.get_row_data()
 
+# float update
+for key, value in data.items():
+    if isinstance(value, dict) and "spend" in value:
+        data[key]["spend"] = float(value["spend"])
+
+data["total_spend"] = float(data["total_spend"])
+
+# pie charct gen
+generate_pie_chart(data)
+
+
+
 markdown = f"""# Genshin Impact - Whale Calculator
 This is a Calculator what is a maximu for GI whale spend on game with worst luck. 
 
+## Spend Distribution
+
+![Whale Chart]({SPEND_CHARD_NAME})
+
+"""
+
+"""
+
 ## Total Spend
+
 all C6 characters   {data["Characters"]["spend"]:.2f} usd
+
 all R5 weapons      {data["Weapons"]["spend"]:.2f} usd
+
 Welkin Moon         {data["Welkin_Moon"]["spend"]:.2f} usd
+
 Battle Pass         {data["BP"]["spend"]:.2f} usd
+
 Battle Pass levl up {data["BP_LV_UP"]["spend"]:.2f} usd
+
 Refil Resin         {data["resin_refill"]["spend"]:.2f} usd
+
+---
 
 total               {data["total_spend"]:.2f} usd
 """
@@ -216,4 +301,42 @@ total               {self.total_spend:.2f} usd
 if __name__ == "__main__":    
     wc = whalecalculator()
     wc.main()
+
+
+================================================
+FILE: .github/workflows/update.yml
+================================================
+name: Daily Whale Update
+
+on:
+  schedule:
+    # Spouští se každý den v 00:00 UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Umožňuje spustit aktualizaci i ručně tlačítkem
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install requests matplotlib
+
+      - name: Run update script
+        run: python update_readme.py
+
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "Update daily stats in README" || exit 0
+          git push
 
