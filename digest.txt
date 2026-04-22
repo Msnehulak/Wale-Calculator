@@ -19,16 +19,16 @@ This is a Calculator what is a maximu for GI whale spend on game with worst luck
 ![Whale Chart](spend_chart.png)
 
 ## Table Spend Distribution
-| Type | Spend | 
-| :--- | :--- |
-| all C6 characters    | 190002.21 usd |
-| all R5 weapons       | 60318.16 usd |
-| Welkin Moon          | 334.33 usd |
-| Battle Pass          | 479.52 usd |
-| Battle Pass levl up  | 5654.83 usd |
-| Refil Resin          | 7979.59 usd |
-| | |
-| Totalz                 | 264768.64 usd |
+| Type | Spend (EUR) | Spend (USD) | Share |
+| :--- | :--- | :--- | :--- |
+| all C6 characters | 161469.58 EUR | 190002.21 USD | 71.8% |
+| all R5 weapons | 51260.18 EUR | 60318.16 USD | 22.8% |
+| Welkin Moon | 284.12 EUR | 334.33 USD | 0.1% |
+| Battle Pass | 407.51 EUR | 479.52 USD | 0.2% |
+| Battle Pass Level Up | 4805.64 EUR | 5654.83 USD | 2.1% |
+| Resin Refill | 6781.29 EUR | 7979.59 USD | 3.0% |
+| | | | |
+| **Total** | **225008.33 EUR** | **264768.64 USD** | **100%** |
 
 
 
@@ -64,8 +64,25 @@ FILE: update_readme.py
 ================================================
 import whale_calculator
 import matplotlib.pyplot as plt
+import requests
 
 SPEND_CHARD_NAME = "spend_chart.png"
+
+def get_exchange_rate():
+    try:
+        response = requests.get("https://api.frankfurter.app/latest?from=USD&to=EUR")
+        if response.status_code == 200:
+            return response.json()["rates"]["EUR"]
+    except:
+        pass
+    return 0.92
+
+eur_rate = get_exchange_rate()
+
+def format_row(name, usd_value, total_usd):
+    percent = (usd_value / total_usd) * 100
+    eur_value = usd_value * eur_rate
+    return f"| {name} | {eur_value:.2f} EUR | {usd_value:.2f} USD | {percent:.1f}% |"
 
 def generate_pie_chart(data):
     categories = ['Characters', 'Weapons', 'Resin Refill', 'Welkin', 'BattlePass', 'BP Levels']
@@ -135,16 +152,16 @@ This is a Calculator what is a maximu for GI whale spend on game with worst luck
 ![Whale Chart]({SPEND_CHARD_NAME})
 
 ## Table Spend Distribution
-| Type | Spend | 
-| :--- | :--- |
-| all C6 characters    | {data["Characters"]["spend"]:.2f} usd |
-| all R5 weapons       | {data["Weapons"]["spend"]:.2f} usd |
-| Welkin Moon          | {data["Welkin_Moon"]["spend"]:.2f} usd |
-| Battle Pass          | {data["BP"]["spend"]:.2f} usd |
-| Battle Pass levl up  | {data["BP_LV_UP"]["spend"]:.2f} usd |
-| Refil Resin          | {data["resin_refill"]["spend"]:.2f} usd |
-| | |
-| Total                | {data["total_spend"]:.2f} usd |
+| Type | Spend (EUR) | Spend (USD) | Share |
+| :--- | :--- | :--- | :--- |
+{format_row("all C6 characters", data["Characters"]["spend"], data["total_spend"])}
+{format_row("all R5 weapons", data["Weapons"]["spend"], data["total_spend"])}
+{format_row("Welkin Moon", data["Welkin_Moon"]["spend"], data["total_spend"])}
+{format_row("Battle Pass", data["BP"]["spend"], data["total_spend"])}
+{format_row("Battle Pass Level Up", data["BP_LV_UP"]["spend"], data["total_spend"])}
+{format_row("Resin Refill", data["resin_refill"]["spend"], data["total_spend"])}
+| | | | |
+| **Total** | **{data["total_spend"] * eur_rate:.2f} EUR** | **{data["total_spend"]:.2f} USD** | **100%** |
 """
 
 write_readme(markdown)

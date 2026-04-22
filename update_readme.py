@@ -1,7 +1,24 @@
 import whale_calculator
 import matplotlib.pyplot as plt
+import requests
 
 SPEND_CHARD_NAME = "spend_chart.png"
+
+def get_exchange_rate():
+    try:
+        response = requests.get("https://api.frankfurter.app/latest?from=USD&to=EUR")
+        if response.status_code == 200:
+            return response.json()["rates"]["EUR"]
+    except:
+        pass
+    return 0.92
+
+eur_rate = get_exchange_rate()
+
+def format_row(name, usd_value, total_usd):
+    percent = (usd_value / total_usd) * 100
+    eur_value = usd_value * eur_rate
+    return f"| {name} | {eur_value:.2f} EUR | {usd_value:.2f} USD | {percent:.1f}% |"
 
 def generate_pie_chart(data):
     categories = ['Characters', 'Weapons', 'Resin Refill', 'Welkin', 'BattlePass', 'BP Levels']
@@ -71,16 +88,16 @@ This is a Calculator what is a maximu for GI whale spend on game with worst luck
 ![Whale Chart]({SPEND_CHARD_NAME})
 
 ## Table Spend Distribution
-| Type | Spend | 
-| :--- | :--- |
-| all C6 characters    | {data["Characters"]["spend"]:.2f} usd |
-| all R5 weapons       | {data["Weapons"]["spend"]:.2f} usd |
-| Welkin Moon          | {data["Welkin_Moon"]["spend"]:.2f} usd |
-| Battle Pass          | {data["BP"]["spend"]:.2f} usd |
-| Battle Pass levl up  | {data["BP_LV_UP"]["spend"]:.2f} usd |
-| Refil Resin          | {data["resin_refill"]["spend"]:.2f} usd |
-| | |
-| Total                | {data["total_spend"]:.2f} usd |
+| Type | Spend (EUR) | Spend (USD) | Share |
+| :--- | :--- | :--- | :--- |
+{format_row("all C6 characters", data["Characters"]["spend"], data["total_spend"])}
+{format_row("all R5 weapons", data["Weapons"]["spend"], data["total_spend"])}
+{format_row("Welkin Moon", data["Welkin_Moon"]["spend"], data["total_spend"])}
+{format_row("Battle Pass", data["BP"]["spend"], data["total_spend"])}
+{format_row("Battle Pass Level Up", data["BP_LV_UP"]["spend"], data["total_spend"])}
+{format_row("Resin Refill", data["resin_refill"]["spend"], data["total_spend"])}
+| | | | |
+| **Total** | **{data["total_spend"] * eur_rate:.2f} EUR** | **{data["total_spend"]:.2f} USD** | **100%** |
 """
 
 write_readme(markdown)
