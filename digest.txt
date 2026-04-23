@@ -11,8 +11,20 @@ Directory structure:
 ================================================
 FILE: README.md
 ================================================
+
 # Genshin Impact - Whale Calculator
-This is a Calculator what is a maximu for GI whale spend on game with worst luck. 
+This is a calculator that estimates how much a Genshin Impact whale can spend in the game.
+
+To remove randomness and make the result deterministic, the calculator assumes worst-case luck:
+- 180 pulls per 5★ character (guaranteed after losing the 50/50)
+- 80 pulls per 5★ weapon
+
+**Note:** 
+For characters, losing the 50/50 is required to reach the deterministic cost.
+For weapons, the model assumes a guaranteed limited 5★ weapon within the pity cycle and does not simulate additional losses.
+
+**!!!** 
+The result represents a theoretical maximum and deterministic cost, not an average or realistic outcome.
 
 ## Pie Spend Distribution
 
@@ -21,14 +33,15 @@ This is a Calculator what is a maximu for GI whale spend on game with worst luck
 ## Table Spend Distribution
 | Type | Spend (EUR) | Spend (USD) | Share |
 | :--- | :--- | :--- | :--- |
-| all C6 characters | 161469.58 EUR | 190002.21 USD | 71.8% |
-| all R5 weapons | 51260.18 EUR | 60318.16 USD | 22.8% |
-| Welkin Moon | 284.12 EUR | 334.33 USD | 0.1% |
-| Battle Pass | 407.51 EUR | 479.52 USD | 0.2% |
-| Battle Pass Level Up | 4805.64 EUR | 5654.83 USD | 2.1% |
-| Resin Refill | 6781.29 EUR | 7979.59 USD | 3.0% |
-| | | | |
-| **Total** | **225008.33 EUR** | **264768.64 USD** | **100%** |
+| All C6 characters | 159108.50 EUR | 186681.33 USD | 67.2% |
+| All R5 weapons | 50536.34 EUR | 59294.07 USD | 21.3% |
+| Welkin Moon | 284.95 EUR | 334.33 USD | 0.1% |
+| Battle Pass | 408.69 EUR | 479.52 USD | 0.2% |
+| Battle Pass Level Up | 4772.40 EUR | 5599.44 USD | 2.0% |
+| Resin Refill | 21390.59 EUR | 25097.49 USD | 9.0% |
+| All skins | 426.11 EUR | 499.95 USD | 0.2% |
+| |
+| **Total** | **236927.58 EUR** | **277986.13 USD** | **100%** |
 
 
 
@@ -62,109 +75,7 @@ SOFTWARE.
 ================================================
 FILE: update_readme.py
 ================================================
-import whale_calculator
-import matplotlib.pyplot as plt
-import requests
-
-SPEND_CHARD_NAME = "spend_chart.png"
-
-def get_exchange_rate():
-    try:
-        response = requests.get("https://api.frankfurter.app/latest?from=USD&to=EUR")
-        if response.status_code == 200:
-            return response.json()["rates"]["EUR"]
-    except:
-        pass
-    return 0.92
-
-eur_rate = get_exchange_rate()
-
-def format_row(name, usd_value, total_usd):
-    percent = (usd_value / total_usd) * 100
-    eur_value = usd_value * eur_rate
-    return f"| {name} | {eur_value:.2f} EUR | {usd_value:.2f} USD | {percent:.1f}% |"
-
-def generate_pie_chart(data):
-    categories = ['Characters', 'Weapons', 'Resin Refill', 'Welkin', 'BattlePass', 'BP Levels']
-    values = [
-        data["Characters"]["spend"],
-        data["Weapons"]["spend"],
-        data["resin_refill"]["spend"],
-        data["Welkin_Moon"]["spend"],
-        data["BP"]["spend"],
-        data["BP_LV_UP"]["spend"],
-    ]
-
-    total = sum(values)
-    legend_labels = [f'{l}: {v/total*100:1.1f}%' for l, v in zip(categories, values)]
-
-    colors = ['#ff9999','#66b3ff','#99ff99','#ffcc99','#c2c2f0','#ffb3e6']
-
-    fig, ax = plt.subplots(figsize=(14, 8), facecolor='none')
-
-    wedges, _ = ax.pie(
-        values, 
-        colors=colors, 
-        startangle=140, 
-        pctdistance=0.85,
-        labeldistance=1.1
-    )
-
-    ax.legend(
-        wedges, 
-        legend_labels,
-        title="Categories",
-        loc="center left",
-        bbox_to_anchor=(1, 0, 0.5, 1),
-        fontsize=12,
-        frameon=True,
-    )
-
-    ax.set_title('Genshin Impact Whale Spend Distribution', pad=20, size=16, color='white')
-
-    plt.savefig('spend_chart.png', transparent=True, bbox_inches='tight')
-    plt.close()
-
-def write_readme(markdown):
-    with open("README.md", "w", encoding="utf-8") as f:
-        f.write(markdown)
-
-wc = whale_calculator.whalecalculator()
-data = wc.get_row_data()
-
-# float update
-for key, value in data.items():
-    if isinstance(value, dict) and "spend" in value:
-        data[key]["spend"] = float(value["spend"])
-
-data["total_spend"] = float(data["total_spend"])
-
-# pie charct gen
-generate_pie_chart(data)
-
-
-
-markdown = f"""# Genshin Impact - Whale Calculator
-This is a Calculator what is a maximu for GI whale spend on game with worst luck. 
-
-## Pie Spend Distribution
-
-![Whale Chart]({SPEND_CHARD_NAME})
-
-## Table Spend Distribution
-| Type | Spend (EUR) | Spend (USD) | Share |
-| :--- | :--- | :--- | :--- |
-{format_row("all C6 characters", data["Characters"]["spend"], data["total_spend"])}
-{format_row("all R5 weapons", data["Weapons"]["spend"], data["total_spend"])}
-{format_row("Welkin Moon", data["Welkin_Moon"]["spend"], data["total_spend"])}
-{format_row("Battle Pass", data["BP"]["spend"], data["total_spend"])}
-{format_row("Battle Pass Level Up", data["BP_LV_UP"]["spend"], data["total_spend"])}
-{format_row("Resin Refill", data["resin_refill"]["spend"], data["total_spend"])}
-| | | | |
-| **Total** | **{data["total_spend"] * eur_rate:.2f} EUR** | **{data["total_spend"]:.2f} USD** | **100%** |
-"""
-
-write_readme(markdown)
+Error reading file with 'cp1250': 'charmap' codec can't decode byte 0x98 in position 2716: character maps to <undefined>
 
 
 ================================================
@@ -172,6 +83,7 @@ FILE: whale_calculator.py
 ================================================
 from datetime import date
 import requests
+import math
 
 class whalecalculator:
     def __init__(self):
@@ -189,7 +101,7 @@ class whalecalculator:
         }
         self.primo = {
             "bplvup": 150,
-            "refil_resin": 50,
+            "refil_resin": [50, 100, 100, 150, 200, 200],
             "pull": 160
         }
         self.total_spend = 0
@@ -201,14 +113,15 @@ class whalecalculator:
         self.days_from_releas = self.days_from_releas.days
         self.versin_released = self.days_from_releas // (7 * 6) 
 
-        self.Characters()
-        self.Weapons()
-        self.Welkin_Moon()
-        self.Batle_pass()
-        self.Batle_pass_levl_up()
-        self.Daly_resin_refill()
+        self.characters()
+        self.weapons()
+        self.welkin_moon()
+        self.battle_pass()
+        self.battle_pass_level_up()
+        self.daly_resin_refill()
+        self.skins()
 
-    def Characters(self):
+    def characters(self):
         self.char_standard5_list = ["Jean", "Diluc", "Qiqi", "Mona", "Keqing", "Tighnari", "Dehya", "Mizuki"]
         self.char_standard5_count = len(self.char_standard5_list) 
         self.char_limited5char_list = self.get_limited_character_count()
@@ -222,7 +135,7 @@ class whalecalculator:
 
         self.total_spend += self.char_spend
     
-    def Weapons(self):
+    def weapons(self):
         self.wpn_count = self.char_limited5_count
         self.wpn_pulls_one_copy = 80
         self.wpn_pulls_R5 = self.wpn_pulls_one_copy * 5
@@ -232,32 +145,55 @@ class whalecalculator:
 
         self.total_spend += self.wpn_spend
 
-    def Welkin_Moon(self):
+    def welkin_moon(self):
         self.welkin_moon_owned = self.days_from_releas // 30 
         self.welkin_moon_spend = self.welkin_moon_owned * self.prices["welkin"]
         
         self.total_spend += self.welkin_moon_spend
 
-    def Batle_pass(self):
+    def battle_pass(self):
         self.BP_owned = self.versin_released
         self.BP_spend = self.BP_owned * self.prices["battle_pass"]
         
         self.total_spend += self.BP_spend
 
-    def Batle_pass_levl_up(self):
-        self.BP_LV_UP_count = self.BP_owned * 50
+    def battle_pass_level_up(self):
+        self.BP_LV_UP_levels = 50
+        self.BP_LV_UP_count = self.BP_owned * self.BP_LV_UP_levels
         self.BP_LV_UP_spend_primo = self.BP_LV_UP_count * self.primo["bplvup"]
         self.BP_LV_UP_spend = self.primo_to_usd(self.BP_LV_UP_spend_primo)
 
         self.total_spend += self.BP_LV_UP_spend 
 
-    def Daly_resin_refill(self):
-        self.resin_refill_limit = 5
-        self.resin_refil_count = self.resin_refill_limit * self.days_from_releas
-        self.resin_refil_spend_primo = self.resin_refil_count * self.primo["refil_resin"]
+    def daly_resin_refill(self):
+        self.resin_refill_dayli_refil = sum(self.primo["refil_resin"])
+        self.resin_refil_spend_primo = self.resin_refill_dayli_refil * self.days_from_releas
         self.resin_refil_spend = self.primo_to_usd(self.resin_refil_spend_primo)
 
         self.total_spend += self.resin_refil_spend
+
+    def skins(self):
+        self.skin_list = [
+            1680, # Sea Breeze Dandelion - Jean
+            1680, # Summertime Sparkle - Barbara
+            1680, # Opulent Splendor - Keqing
+            1680, # Orchid's Evening Gown - Ningguang
+            2480, # Red Dead of Night - Diluc
+            1680, # Ein Immernachtstraum - Fischl
+            1680, # Springbloom Missive - Ayaka
+            1680, # A Sobriquet Under Shade - Lisa
+            1680, # Blossoming Starlight - Klee
+            1680, # Sailwind Shadow - Kaeya
+            1680, # Frostflower Dew - Ganyu
+            1680, # Twilight Blossom - Shenhe
+            1680, # Bamboo Rain - Xingqiu
+            1680, # Breeze of Sabaa - Nilou
+            1680, # Phantom in Boots - Kirara
+        ]
+        self.skin_total_primo = sum(self.skin_list)
+        self.skin_spend = self.primo_to_usd(self.skin_total_primo)
+
+        self.total_spend += self.skin_spend
 
     def get_limited_character_count(self):
             # requests
@@ -267,9 +203,9 @@ class whalecalculator:
         if response.status_code == 200:
             characters = list(response.json())
         else:
-            print("error, API don't work")
-            return []
-        
+            print("error, API don't work, using hard code list")
+            characters = ['Aether', 'Albedo', 'Alhaitham', 'Aloy', 'Arataki Itto', 'Arlecchino', 'Baizhu', 'Chasca', 'Chiori', 'Citlali', 'Clorinde', 'Columbina', 'Cyno', 'Dehya', 'Diluc', 'Durin', 'Emilie', 'Escoffier', 'Eula', 'Flins', 'Furina', 'Ganyu', 'Hu Tao', 'Ineffa', 'Jean', 'Kaedehara Kazuha', 'Kamisato Ayaka', 'Kamisato Ayato', 'Keqing', 'Kinich', 'Klee', 'Lauma', 'Linnea', 'Lumine', 'Lyney', 'Manekin', 'Manekina', 'Mavuika', 'Mona', 'Mualani', 'Nahida', 'Navia', 'Nefer', 'Neuvillette', 'Nilou', 'Qiqi', 'Raiden Shogun', 'Sangonomiya Kokomi', 'Shenhe', 'Sigewinne', 'Skirk', 'Tartaglia', 'Tighnari', 'Varesa', 'Varka', 'Venti', 'Wanderer', 'Wriothesley', 'Xianyun', 'Xiao', 'Xilonen', 'Yae Miko', 'Yelan', 'Yoimiya', 'Yumemizuki Mizuki', 'Zhongli', 'Zibai']
+            
             # Filter standard 5*
         limited5char = []
         for char in characters:
@@ -278,17 +214,26 @@ class whalecalculator:
             else:
                 limited5char.append(char)
         return limited5char
+    
+    def primo_to_usd(self, primo, use_largest_bundle_only=True):
+        """
+        Convert primogems to USD.
+        use_largest_bundle_only = True  â†’ whale buys only 6480 packs
+        use_largest_bundle_only = False â†’ uses average across all packs
+        """
+        if use_largest_bundle_only:
+            crys, price = self.prices["crystal"][5]
+            return math.ceil(primo / crys) * price
+        else:
+            costs_per_crystal = []
+                
+            for crys, price in self.prices["crystal"]:
+                costs_per_crystal.append(price / crys)
+            
+            average_cost_per_crystal = sum(costs_per_crystal) / len(costs_per_crystal)
 
-    def primo_to_usd(self, primo):
-        bundles = self.prices["crystal"]
-
-        costs_per_crystal = []
-        for crys, price in bundles:
-            costs_per_crystal.append(price / crys)
-        
-        average_cost_per_crystal = sum(costs_per_crystal) / len(costs_per_crystal)
-        
-        return round(primo * average_cost_per_crystal, 2)
+            return round(primo * average_cost_per_crystal, 2)
+            
 
     def get_row_data(self):
         return {
@@ -310,6 +255,9 @@ class whalecalculator:
             "resin_refill": {
                 "spend": self.resin_refil_spend   
             },
+            "skin": {
+                "spend": self.skin_spend
+            },
             "total_spend": self.total_spend
         }
 
@@ -317,12 +265,13 @@ class whalecalculator:
         print(f"""
 {"="*40}
             Total Spend
+all C6 characters   {self.char_spend:.2f} usd
+all R5 weapons      {self.wpn_spend:.2f} usd 
 Welkin Moon         {self.welkin_moon_spend:.2f} usd
 Battle Pass         {self.BP_spend:.2f} usd
 Battle Pass levl up {self.BP_LV_UP_spend:.2f} usd
 Refil Resin         {self.resin_refil_spend:.2f} usd
-all C6 characters   {self.char_spend:.2f} usd
-all R5 weapons      {self.wpn_spend:.2f} usd 
+Skins               {self.skin_spend:.2f} usd
 
 total               {self.total_spend:.2f} usd
 {"="*40}
@@ -366,7 +315,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add README.md spend_chart.png
+          git add .
           git commit -m "Update daily stats in README" || exit 0
           git push
 

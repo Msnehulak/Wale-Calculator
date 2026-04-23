@@ -1,5 +1,6 @@
 from datetime import date
 import requests
+import math
 
 class whalecalculator:
     def __init__(self):
@@ -33,7 +34,7 @@ class whalecalculator:
         self.weapons()
         self.welkin_moon()
         self.battle_pass()
-        self.battle_pass_levl_up()
+        self.battle_pass_level_up()
         self.daly_resin_refill()
         self.skins()
 
@@ -73,7 +74,7 @@ class whalecalculator:
         
         self.total_spend += self.BP_spend
 
-    def battle_pass_levl_up(self):
+    def battle_pass_level_up(self):
         self.BP_LV_UP_levels = 50
         self.BP_LV_UP_count = self.BP_owned * self.BP_LV_UP_levels
         self.BP_LV_UP_spend_primo = self.BP_LV_UP_count * self.primo["bplvup"]
@@ -130,21 +131,26 @@ class whalecalculator:
             else:
                 limited5char.append(char)
         return limited5char
-
-    def primo_to_usd(self, primo):
+    
+    def primo_to_usd(self, primo, use_largest_bundle_only=True):
         """
-        Take primo and transfer it in to usd base.
-        I use avrige of all bundles becose i wont maximum acurate primo to usd.
+        Convert primogems to USD.
+        use_largest_bundle_only = True  → whale buys only 6480 packs
+        use_largest_bundle_only = False → uses average across all packs
         """
-        bundles = self.prices["crystal"]
+        if use_largest_bundle_only:
+            crys, price = self.prices["crystal"][5]
+            return math.ceil(primo / crys) * price
+        else:
+            costs_per_crystal = []
+                
+            for crys, price in self.prices["crystal"]:
+                costs_per_crystal.append(price / crys)
+            
+            average_cost_per_crystal = sum(costs_per_crystal) / len(costs_per_crystal)
 
-        costs_per_crystal = []
-        for crys, price in bundles:
-            costs_per_crystal.append(price / crys)
-        
-        average_cost_per_crystal = sum(costs_per_crystal) / len(costs_per_crystal)
-        
-        return round(primo * average_cost_per_crystal, 2)
+            return round(primo * average_cost_per_crystal, 2)
+            
 
     def get_row_data(self):
         return {
@@ -183,7 +189,6 @@ Battle Pass         {self.BP_spend:.2f} usd
 Battle Pass levl up {self.BP_LV_UP_spend:.2f} usd
 Refil Resin         {self.resin_refil_spend:.2f} usd
 Skins               {self.skin_spend:.2f} usd
-
 
 total               {self.total_spend:.2f} usd
 {"="*40}

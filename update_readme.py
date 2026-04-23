@@ -83,8 +83,20 @@ generate_pie_chart(data)
 
 
 
-markdown = f"""# Genshin Impact - Whale Calculator
-This is a Calculator what is a maximu for GI whale spend on game with worst luck. 
+markdown = f"""
+# Genshin Impact - Whale Calculator
+This is a calculator that estimates how much a Genshin Impact whale can spend in the game.
+
+To remove randomness and make the result deterministic, the calculator assumes worst-case luck:
+- 180 pulls per 5★ character (guaranteed after losing the 50/50)
+- 80 pulls per 5★ weapon
+
+**Note:** 
+For characters, losing the 50/50 is required to reach the deterministic cost.
+For weapons, the model assumes a guaranteed limited 5★ weapon within the pity cycle and does not simulate additional losses.
+
+**!!!** 
+The result represents a theoretical maximum and deterministic cost, not an average or realistic outcome.
 
 ## Pie Spend Distribution
 

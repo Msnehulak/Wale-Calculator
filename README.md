@@ -1,5 +1,17 @@
+
 # Genshin Impact - Whale Calculator
-This is a Calculator what is a maximu for GI whale spend on game with worst luck. 
+This is a calculator that estimates how much a Genshin Impact whale can spend in the game.
+
+To remove randomness and make the result deterministic, the calculator assumes worst-case luck:
+- 180 pulls per 5★ character (guaranteed after losing the 50/50)
+- 80 pulls per 5★ weapon
+
+**Note:** 
+For characters, losing the 50/50 is required to reach the deterministic cost.
+For weapons, the model assumes a guaranteed limited 5★ weapon within the pity cycle and does not simulate additional losses.
+
+**!!!** 
+The result represents a theoretical maximum and deterministic cost, not an average or realistic outcome.
 
 ## Pie Spend Distribution
 
@@ -8,12 +20,12 @@ This is a Calculator what is a maximu for GI whale spend on game with worst luck
 ## Table Spend Distribution
 | Type | Spend (EUR) | Spend (USD) | Share |
 | :--- | :--- | :--- | :--- |
-| All C6 characters | 161938.88 EUR | 190002.21 USD | 67.2% |
-| All R5 weapons | 51409.17 EUR | 60318.16 USD | 21.3% |
+| All C6 characters | 159108.50 EUR | 186681.33 USD | 67.2% |
+| All R5 weapons | 50536.34 EUR | 59294.07 USD | 21.3% |
 | Welkin Moon | 284.95 EUR | 334.33 USD | 0.1% |
 | Battle Pass | 408.69 EUR | 479.52 USD | 0.2% |
-| Battle Pass Level Up | 4819.61 EUR | 5654.83 USD | 2.0% |
-| Resin Refill | 21773.92 EUR | 25547.25 USD | 9.0% |
-| All skins | 348.08 EUR | 408.40 USD | 0.1% |
+| Battle Pass Level Up | 4772.40 EUR | 5599.44 USD | 2.0% |
+| Resin Refill | 21390.59 EUR | 25097.49 USD | 9.0% |
+| All skins | 426.11 EUR | 499.95 USD | 0.2% |
 | |
-| **Total** | **240983.31 EUR** | **282744.70 USD** | **100%** |
+| **Total** | **236927.58 EUR** | **277986.13 USD** | **100%** |
