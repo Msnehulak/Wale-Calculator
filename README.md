@@ -25,7 +25,7 @@ The result represents a theoretical maximum and deterministic cost, not an avera
 | Welkin Moon | 289.97 EUR | 339.32 USD | 0.1% |
 | Battle Pass | 409.77 EUR | 479.52 USD | 0.2% |
 | Battle Pass Level Up | 4785.00 EUR | 5599.44 USD | 2.0% |
-| Resin Refill | 21532.51 EUR | 25197.48 USD | 9.1% |
+| Resin Refill | 21617.95 EUR | 25297.47 USD | 9.1% |
 | All skins | 427.23 EUR | 499.95 USD | 0.2% |
 | |
-| **Total** | **237642.76 EUR** | **278091.11 USD** | **100%** |
+| **Total** | **237728.20 EUR** | **278191.10 USD** | **100%** |
